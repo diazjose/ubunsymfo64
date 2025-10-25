@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block body %}
+<div class="card shadow p-4">
+  <h3 class="mb-3">Bienvenido 👋</h3>
+  <p>Estás logueado como <strong>{{ app.user.userIdentifier }}</strong>.</p>
+</div>
+{% endblock %}

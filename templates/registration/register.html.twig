@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Crear cuenta{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+  <div class="card shadow p-4" style="min-width: 400px;">
+    <h4 class="text-center mb-3">📝 Crear cuenta</h4>
+
+    {{ form_start(registrationForm) }}
+
+      <div class="mb-3">
+        {{ form_label(registrationForm.email) }}
+        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+        {% if registrationForm.email.vars.errors|length > 0 %}
+          <div class="text-danger small">
+            {{ form_errors(registrationForm.email) }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="mb-3">
+        {{ form_label(registrationForm.plainPassword.first) }}
+        {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+        {% if registrationForm.plainPassword.first.vars.errors|length > 0 %}
+          <div class="text-danger small">
+            {{ form_errors(registrationForm.plainPassword.first) }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="mb-3">
+        {{ form_label(registrationForm.plainPassword.second) }}
+        {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+        {% if registrationForm.plainPassword.second.vars.errors|length > 0 %}
+          <div class="text-danger small">
+            {{ form_errors(registrationForm.plainPassword.second) }}
+          </div>
+        {% endif %}
+      </div>
+
+      {{ form_widget(registrationForm.Registrar) }}
+
+    {{ form_end(registrationForm) }}
+
+    <div class="text-center mt-3">
+      <a href="{{ path('app_login') }}">¿Ya tenés cuenta? Iniciá sesión</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
