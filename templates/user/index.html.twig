@@ -1,0 +1,279 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Listado de Usuarios{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- DataTables + Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Listado de Usuarios</h1>
+{#}
+        <a href="{{ path('app_register') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nuevo Usuario
+        </a>
+#}
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateUser">
+            Nuevo Usuario
+        </button>
+    </div>
+
+    {#{% for msg in app.flashes('success') %}
+        <div class="alert alert-success">{{ msg }}</div>
+    {% endfor %}#}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table id="userTable" class="table table-striped table-hover" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                  
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.nombre }}</td>
+                        <td>{{ user.apellido }}</td>
+                        <td>
+                            {% if user.deletedAt is null %}
+                                <i class="bi bi-person-fill-check text-success"></i>
+                            {% else %}
+                                <i class="bi bi-person-fill-slash text-danger"></i>
+                            {% endif %}                        
+                        </td>
+                        <td class="text-center">
+                            {#
+                            <a href="{{ path('app_user_show', { id: user.id }) }}" class="btn btn-sm btn-outline-secondary me-1">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            #}
+                            <button class="btn btn-sm btn btn-outline-success me-1" data-bs-toggle="modal" data-bs-target="#modalEditUser{{user.id}}">
+                                <i class="bi bi-pencil"></i>
+                            </button>    
+            
+                            <button class="btn btn-sm btn btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#modalConfig{{user.id}}">
+                                <i class="bi bi-person-gear"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">No hay usuarios registrados.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Modal Crear -->
+<div class="modal fade" id="modalCreateUser" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><strong>Crear Usuario</strong></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        
+        {{ form_start(registrationForm) }}
+
+            <div class="mb-3">
+                {{ form_label(registrationForm.email) }}
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                {% if registrationForm.email.vars.errors|length > 0 %}
+                <div class="text-danger small">
+                    {{ form_errors(registrationForm.email) }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(registrationForm.nombre) }}
+                {{ form_widget(registrationForm.nombre, {'attr': {'class': 'form-control'}}) }}
+                {% if registrationForm.email.vars.errors|length > 0 %}
+                <div class="text-danger small">
+                    {{ form_errors(registrationForm.nombre) }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(registrationForm.apellido) }}
+                {{ form_widget(registrationForm.apellido, {'attr': {'class': 'form-control'}}) }}
+                {% if registrationForm.email.vars.errors|length > 0 %}
+                <div class="text-danger small">
+                    {{ form_errors(registrationForm.apellido) }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(registrationForm.plainPassword.first) }}
+                {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+                {% if registrationForm.plainPassword.first.vars.errors|length > 0 %}
+                <div class="text-danger small">
+                    {{ form_errors(registrationForm.plainPassword.first) }}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(registrationForm.plainPassword.second) }}
+                {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+                {% if registrationForm.plainPassword.second.vars.errors|length > 0 %}
+                <div class="text-danger small">
+                    {{ form_errors(registrationForm.plainPassword.second) }}
+                </div>
+                {% endif %}
+            </div>
+
+            {{ form_widget(registrationForm.Registrar) }}
+
+        {{ form_end(registrationForm) }}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar -->
+{% for user in users %}
+<div class="modal fade" id="modalEditUser{{user.id}}" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><strong>📝 Editar Usuario</strong></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        
+        <form action="{{ path('app_user_edit', {'id': user.id}) }}" method="POST">
+
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control" value="{{ user.email }}" required autofocus>
+            </div>
+
+            <div class="mb-3">
+                <label>Nombre</label>
+                <input type="text" name="nombre" class="form-control" value="{{ user.nombre }}" required autofocus>
+            </div>
+
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="text" name="apellido" class="form-control" value="{{ user.apellido }}" required autofocus>
+            </div>
+
+             <button class="btn btn-sm btn-success" type="submit"> <i class="bi bi-pencil"></i> ACTUALIZAR</button>      
+
+        </form>
+
+      </div>
+      
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<!-- Modal Configuracio -->
+{% for user in users %}
+    <div class="modal fade" id="modalConfig{{user.id}}" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><strong>Configurar Usuario</strong></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                {% if user.deletedAt is null %}
+                    <div>
+                        ¿Seguro que querés Bloquear a <strong>{{user.apellido }}, {{user.nombre }}</strong>?
+                    </div>
+                {% else %}
+                    <div>
+                        ¿Seguro que querés DesBloquear a <strong>{{user.apellido }}, {{user.nombre }}</strong>?
+                    </div>
+                {% endif %}
+                <hr>                    
+                <form 
+                    method="post" 
+                    action="{{ path('app_user_status', { id: user.id }) }}" 
+                    style="display:inline-block"
+                    >
+                    <input type="hidden" name="_token" value="{{ csrf_token('restore' ~ user.id) }}">
+                    {% if user.deletedAt is null %}
+                        <button class="btn btn-sm btn-danger">
+                           <i class="bi bi-person-fill-slash"></i> BLOQUEAR
+                        </button>
+                    {% else %}
+                        <button class="btn btn-sm btn-success">
+                           <i class="bi bi-person-fill-check"></i> DESBLOQUEAR
+                        </button>
+                    {% endif %}
+
+                </form>  
+
+                <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">
+                    CANCELAR
+                </button>
+            </div>
+            {#}
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary" onclick="document.getElementById('form-create').submit();">
+                    Guardar
+                </button>
+            </div>#}
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <!-- jQuery + DataTables + Bootstrap 5 -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#userTable').DataTable({
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                },
+                "pageLength": 10,
+                "order": [[0, "asc"]]
+            });
+        });
+    </script>
+{% endblock %}

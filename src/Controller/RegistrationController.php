@@ -22,7 +22,7 @@ class RegistrationController extends AbstractController
     public function __construct(private EmailVerifier $emailVerifier)
     {
     }
-
+ 
     #[Route('/register', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
     {
@@ -39,8 +39,10 @@ class RegistrationController extends AbstractController
             $user->setRoles(["ROLE_USER"]);    
             $entityManager->persist($user);
             $entityManager->flush();
+            $this->addFlash('success', 'Usuario Creado correctamente');
 
             // generate a signed url and email it to the user
+        /*   
             $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
                 (new TemplatedEmail())
                     ->from(new Address('diazjose481@gmail.com', 'symfony64'))
@@ -51,12 +53,15 @@ class RegistrationController extends AbstractController
 
             // do anything else you need here, like send an email
 
-            return $security->login($user, 'form_login', 'main');
+            return $security->login($user, 'form_login', 'main'); */
+        }else{
+            $this->addFlash('success', 'El Usuario no se ha creado');
         }
-
+        return $this->redirectToRoute('app_user');
+        /*
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form,
-        ]);
+        ]);*/
     }
 
     #[Route('/verify/email', name: 'app_verify_email')]

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Mi App{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+
     {#<link rel="stylesheet" href="{{ asset('build/app.css') }}">
     {# Estilos de Bootstrap y tus CSS #}
     {{ importmap('app') }}
@@ -23,20 +25,22 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('app_home') }}">Inicio</a>
                     </li>
-
+                    {% set currentRoute = app.request.attributes.get('_route') %}
                     {% if app.user %}
                         <li class="nav-item">
-                            <a class="nav-link disabled" href="#">👋 {{ app.user.userIdentifier }}</a>
+                            <a class="nav-link {{ currentRoute == 'app' ? 'active disabled' : '' }}" href="#">
+                                👋 {{ app.user.userIdentifier }}
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_logout') }}">Salir</a>
+                            <a class="nav-link {{ currentRoute == 'app_user' ? 'active disabled' : '' }}" href="{{ currentRoute == 'app_user' ? '#' : path('app_user') }}">Usuarios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ currentRoute == 'app_logout' ? '#' : path('app_logout') }}">Salir</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ path('app_login') }}">Entrar</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_register') }}">Registro</a>
                         </li>
                     {% endif %}
                 </ul>
