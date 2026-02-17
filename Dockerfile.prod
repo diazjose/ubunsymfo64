@@ -1,0 +1,23 @@
+FROM php:8.2-apache
+
+RUN apt-get update && apt-get install -y \
+    git unzip libicu-dev libzip-dev curl \
+    && docker-php-ext-install intl pdo pdo_mysql zip opcache
+
+RUN a2enmod rewrite
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# Composer desde imagen oficial
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
+WORKDIR /var/www/html
+COPY . .
+
+# Dependencias prod
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Permisos
+RUN chown -R www-data:www-data /var/www/html/var
+
+# Opcional: warmup de cache (si no requiere DB al boot)
+# RUN php bin/console cache:warmup --env=prod
